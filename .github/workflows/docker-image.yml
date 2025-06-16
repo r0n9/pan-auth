@@ -1,0 +1,32 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/pan-auth
+      TAG: ${{ github.run_id }}-${{ github.run_number }}
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub using access token
+      run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+    - name: Build the Docker image
+      run: |
+        echo "Building image: $IMAGE_NAME:$TAG"
+        docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG --tag $IMAGE_NAME:latest
+
+    - name: Push the Docker image
+      run: |
+        echo "Pushing image: $IMAGE_NAME:$TAG"
+        docker push $IMAGE_NAME:$TAG
+        docker push $IMAGE_NAME:latest
