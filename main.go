@@ -2,7 +2,6 @@ package main
 
 import (
 	"auth-api/app"
-
 	"github.com/gin-gonic/gin"
 )
 
